@@ -8,19 +8,19 @@
 #
 
 # Setting DEFAULTS
-echo "interactive" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-echo "interactive" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-echo "interactive" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
-echo "interactive" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
+echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+echo "ondemand" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
+echo "ondemand" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
 echo "192000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 
 echo "192000" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
 echo "192000" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
 echo "192000" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
-echo "58" > /sys/kernel/hotplug_control/all_cpus_threshold
-echo "10" > /sys/kernel/hotplug_control/hotplug_sampling
-echo "78" > /sys/kernel/hotplug_control/single_cpu_threshold
+echo "40" > /sys/kernel/hotplug_control/all_cpus_threshold
+echo "8" > /sys/kernel/hotplug_control/hotplug_sampling
+echo "45" > /sys/kernel/hotplug_control/single_cpu_threshold
 echo "1" > /sys/kernel/hotplug_control/low_latency
-echo "1094400" > /sys/kernel/hotplug_control/up_frequency
+echo "1190400" > /sys/kernel/hotplug_control/up_frequency
 echo "Y" > /sys/module/msm_thermal_v2/parameters/enabled
 echo "65" > /sys/module/msm_thermal_v2/parameters/core_limit_temp_degC
 echo "70" > /sys/module/msm_thermal_v2/parameters/limit_temp_degC
@@ -45,6 +45,22 @@ if [ -e /sys/kernel/power_suspend/power_suspend_mode ]; then
 	echo "Powersuspend enabled" | tee /dev/kmsg
 else
 	echo "Failed to set powersuspend" | tee /dev/kmsg
+	
+
+# Set lowmemorykiller tunables - thanks to Attack11
+
+if [ -e /sys/module/lowmemorykiller/parameters/adj ];
+then
+   echo "0,58,117,176,529,1000" > /sys/module/lowmemorykiller/parameters/adj
+fi;
+
+if [ -e /sys/module/lowmemorykiller/parameters/minfree ];
+then
+   echo "12288,15360,18432,21504,24576,30720" > /sys/module/lowmemorykiller/parameters/minfree
+fi;
+
+
+
 
 # Enable init.d with permissions;
 if /sbin/bbx [ ! -e /system/etc/init.d ]; then
